@@ -83,7 +83,62 @@ Does your answer contain:
 
 
 <!-- YOUR DERIVATION GOES HERE -->
+\quad
+We aim to obtain the inverse cumulative distribution function (CDF) of the Generalised Pareto Distribution (GPD). According to Probability Integral Transform, we know that if we let $A = F_X(X)$, and if $A \sim U[0,1]$, then the quantile function $F^{-1}_X: [0,1] \rightarrow [u, x^+]$ (inverse CDF function) can be derived from the @eq-gpd-cdf. Hence, we let $A\in [0,1]$ and solve for $x$.
 
+The inverse CDF function could be divided into 2 situations. We start from the CDF of the GPD when $(\xi \neq 0)$:
+
+$$
+A = 1 - \left(1 + \frac{\xi(x - u)}{\sigma}\right)^{-1/\xi} \quad \iff
+$$
+$$
+1 - A = \left(1 + \frac{\xi(x - u)}{\sigma}\right)^{-1/\xi} \quad \iff
+$$
+$$
+(1 - A)^{-\xi} = 1 + \frac{\xi(x - u)}{\sigma} \quad \iff
+$$
+$$
+- \frac{\xi(x - u)}{\sigma} = 1 - (1 - A)^{-\xi} \quad \iff
+$$
+$$
+{\xi}(x - u) = {\sigma} ((1 - A)^{-\xi} - 1) \quad \iff
+$$
+$$
+x - u = \frac{\sigma}{\xi} ((1 - A)^{-\xi} - 1) \quad \iff
+$$
+$$
+x = u + \frac{\sigma}{\xi} \left[ (1 - A)^{-\xi} - 1 \right].
+$$
+
+Hence, for $\xi \neq 0$, the quantile function is
+
+$$
+F_X^{-1}(A) = u + \frac{\sigma}{\xi}\left[ (1 - A)^{-\xi} - 1 \right],  \quad A\in [0,1].
+$$
+
+For the other case $\xi = 0$, we derive the inverse CDF function from the @eq-gpd-pdf, again we let $A\in [0,1]$ and set $A = F_X(X)$, then we get:
+
+$$
+A = 1 - \exp\!\left(-\dfrac{x-u}{\sigma}\right) \quad \iff
+$$
+$$
+ \exp\!\left(-\dfrac{x-u}{\sigma}\right) = 1 - A \quad \iff
+$$
+$$
+-\dfrac{x-u}{\sigma} = \ln(1 - A) \quad \iff
+$$
+$$
+x-u = -\sigma\left(\ln(1 - A)\right) \quad \iff
+$$
+$$
+x = u -\sigma\ln(1 - A) \quad \iff
+$$
+
+Hence, for $\xi = 0$, the quantile function is
+
+$$
+F_X^{-1}(A) = u - \sigma \ln(1 - A), \quad A\in [0,1].
+$$
 
 
 ### Question 2 
