@@ -1,7 +1,7 @@
 ---
 title: "MATH70076: Data Science - Coursework 1"
 subtitle: 'MSc in Statistics 2025/26, Imperial College London'
-author: "YOUR CID GOES HERE"
+author: "06046525"
 format:
   html:
     toc: true
