@@ -162,9 +162,61 @@ Does your answer:
 - return the correct quantile values? 
 
 :::
-
+for (a),
 ```{r}
 # YOUR CODE GOES HERE
+#' Quantile function of the Generalized Pareto Distribution (GPD)
+#'
+#' Computes quantiles (inverse CDF) for the GPD with given threshold (u), scale (sigma),
+#' and shape (xi) parameters. The function works similarly to qnorm() or qunif().
+#'
+#' @param p Numeric vector of probabilities, 0 <= p < 1.
+#' @param u Numeric scalar, threshold (location) parameter.
+#' @param sigma Positive numeric scalar, scale parameter.
+#' @param xi Numeric scalar, shape parameter.
+#'
+#' @return A numeric vector of quantiles corresponding to the input probabilities.
+#'
+#' @examples
+#' qgpd(c(0.5, 0.75, 0.99), u = 1.5, sigma = 2, xi = -0.4)
+#'
+#' @export
+qgpd <- function(p, u = 0, sigma = 1, xi = 0) {
+  # input checks
+  stopifnot(
+  is.numeric(xi),
+  length(xi) == 1,
+  is.numeric(p),
+  all(p >= 0 & p <= 1),
+  is.numeric(sigma),
+  length(sigma) == 1,
+  sigma > 0,
+  is.numeric(u),
+  length(u) == 1
+  )
+
+  # main computation
+  if (xi == 0) {
+    q <- u - sigma * log(1 - p)
+  } else {
+    q <- u + (sigma / xi) * ((1 - p)^(-xi) - 1)
+  }
+
+  return(q)
+}
+```
+
+For (b),
+```{r}
+# given parameters
+u_val <- 1.5
+sigma_val <- 2
+xi_val <- -0.4
+p_vec <- c(0.5, 0.75, 0.99)
+
+# use qgpd function
+x_p <- qgpd(p_vec, u = u_val, sigma = sigma_val, xi = xi_val)
+x_p
 ```
 
 ### Question 3
