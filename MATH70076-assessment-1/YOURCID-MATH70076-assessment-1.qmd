@@ -165,29 +165,31 @@ Does your answer:
 for (a),
 ```{r}
 # YOUR CODE GOES HERE
-#' Quantile function of the Generalized Pareto Distribution (GPD)
+#' Quantile function of the Generalised Pareto Distribution (GPD)
 #'
-#' Computes quantiles (inverse CDF) for the GPD with given threshold (u), scale (sigma),
-#' and shape (xi) parameters. The function works similarly to qnorm() or qunif().
+#' Calculate the quantiles (inverse cumulative distribution function) 
+#' of a given GPD with given parameters (shape parameter xi, 
+#' scale parameter sigma, and shape parameter xi).
 #'
-#' @param p Numeric vector of probabilities, 0 <= p < 1.
-#' @param u Numeric scalar, threshold (location) parameter.
-#' @param sigma Positive numeric scalar, scale parameter.
-#' @param xi Numeric scalar, shape parameter.
+#' @param p Vector of probabilities (0 <= p <= 1).
+#' @param u Vector of threshold/location (numeric parameter).
+#' @param sigma Vector of scale (positive numeric parameter).
+#' @param xi Vector of shape (numeric parameter).
 #'
-#' @return A numeric vector of quantiles corresponding to the input probabilities.
+#' @return A vector of quantiles corresponding to the input probabilities 
+#' and given values of parameters.
 #'
+#' @export
 #' @examples
 #' qgpd(c(0.5, 0.75, 0.99), u = 1.5, sigma = 2, xi = -0.4)
 #'
-#' @export
-qgpd <- function(p, u = 0, sigma = 1, xi = 0) {
+qgpd <- function(p, u, sigma, xi) {
   # input checks
   stopifnot(
-  is.numeric(xi),
-  length(xi) == 1,
   is.numeric(p),
   all(p >= 0 & p <= 1),
+  is.numeric(xi),
+  length(xi) == 1,
   is.numeric(sigma),
   length(sigma) == 1,
   sigma > 0,
@@ -208,15 +210,15 @@ qgpd <- function(p, u = 0, sigma = 1, xi = 0) {
 
 For (b),
 ```{r}
-# given parameters
-u_val <- 1.5
-sigma_val <- 2
-xi_val <- -0.4
-p_vec <- c(0.5, 0.75, 0.99)
+# set values for given parameters
+p <- c(0.5, 0.75, 0.99)
+u <- 1.5
+sigma <- 2
+xi <- -0.4
 
-# use qgpd function
-x_p <- qgpd(p_vec, u = u_val, sigma = sigma_val, xi = xi_val)
-x_p
+# use qgpd() function to calculate the quantiles for X_p
+quantiles <- qgpd(p, u = u, sigma = sigma, xi = xi)
+quantiles
 ```
 
 ### Question 3
