@@ -28,6 +28,22 @@ _This coursework is expected to take approximately 5 hours of individual effort 
 _In submitting this assessment you certify that it is entirely your own work, apart from where otherwise acknowledged, and includes no plagiarism. Note that software tools are used as part of plagiarism detection._
 
 -----
+```{r install}
+#| eval: false
+#| echo: false
+install.packages(c("rmarkdown", "knitr", "kableExtra"))
+```
+```{r setup, include = FALSE}
+library(rmarkdown)
+library(knitr)
+library(kableExtra)
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+include_solutions <- TRUE
+```
 
 ## Background 
 
@@ -164,7 +180,10 @@ Does your answer:
 :::
 for (a),
 ```{r}
-# YOUR CODE GOES HERE
+#######################
+# Question 2
+#######################
+# Part A --------------------------
 #' Quantile function of the Generalised Pareto Distribution (GPD)
 #'
 #' Calculate the quantiles (inverse cumulative distribution function) 
@@ -210,6 +229,7 @@ qgpd <- function(p, u, sigma, xi) {
 
 For (b),
 ```{r}
+# Part B --------------------------
 # set values for given parameters
 p <- c(0.5, 0.75, 0.99)
 u <- 1.5
@@ -243,6 +263,70 @@ Does your solution contain:
 :::
 
 <!-- YOUR ANSWER GOES HERE --> 
+```{r}
+#| echo: false
+#| layout-ncol: 3
+#| layout-nrow: 2
+#| fig-width: 9
+#| fig-height: 6
+#| label: fig-qqplots
+#| fig-cap: "QQ plots for the six different GPD datasets compared 
+#| to their stated distributions."
+#| fig-subcap:
+#|   - "Set a"
+#|   - "Set b"
+#|   - "Set c"
+#|   - "Set d"
+#|   - "Set e"
+#|   - "Set f"
+#######################
+# Question 3
+#######################
+samples <- read.csv("gpd_samples.csv")
+parameters <- read.csv("gpd_parameters.csv")
+View(samples)
+View(parameters)
+
+# Plot with the use of loops
+datasets <- unique(samples$set_id)
+
+for (a in datasets) {
+  subset_data <- samples[samples$set_id == a, ]  
+  x <- subset_data$value                        
+
+  n <- length(x)
+  x_sorted <- sort(x)
+  p <- (1:n) / (n + 1)  
+
+  param <- parameters[parameters$id == a, ]
+  u <- param$u
+  sigma <- param$sigma
+  xi <- param$xi
+  u_sim <- param$u_sim
+  sigma_sim <- param$sig_sim
+  xi_sim <- param$xi_sim
+
+  q_theoretical <- qgpd(p, u = u, sigma = sigma, xi = xi)
+  q_sim <- qgpd(p, u = u_sim, sigma = sigma_sim, xi = xi_sim)
+  plot(q_theoretical, x_sorted, main = "", 
+         cex.axis = 1.4, cex.lab = 1.4, pch = 16,
+         xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
+  abline(0, 1, col = "red", lty = 2)
+  points(q_sim, x_sorted, pch = 17, col = "blue")
+  legend("topleft",
+       legend = c("recorded parameters", "simulated parameters"),
+       pch = c(16, 17), col = c("black", "blue"), bty = "n", cex = 2)
+}
+```
+The @fig-qqplots above shows six QQ plots in one figure comparing the sample quantiles with theoretical quantiles based on both the recorded and the simulated parameter sets.
+
+For Set b, the points of recorded parameters (black) scatter closely along the abline, which indicates consistency with the stated distribution. In addition, the recorded and simulated parameter QQ plots overlap along the abline, suggesting that the recorded parameters were likely accurate. Hence, our confidence in this conclusion is high as both parameterisations produce consistent fits.
+
+Additionally, Sets c and f demonstrate moderate deviations when using the recorded parameters, especially at higher quantiles. Both sets align closely with the simulated parameters (blue points), so both parameter sets yield almost identical distributional behaviour. Thus, we can infer that the recorded parameters were correctly specified. The deviation may arise from the sampling variability, because the amount of data for these two sets is low (45 and 22). The level of confidence is lower compared to set b. Because when both sets perform similarly (both showing deviations),  the evidence against parameter errors is weaker, and our confidence corresponds to the conclusion could be lower.
+
+The plots for Set a, d and e present clear deviations, which suggests the parameters were likely recorded incorrectly. For Set a, recorded values deviate from the reference line, and simulated values follow closer to the reference line. This indicates a slight inconsistency with the stated distribution. The recorded and simulated points have distinct paths, especially when the blue points align closely with the red line and the black points do not. We interpret this pattern as strong evidence of parameter misreporting.
+
+Moreover, the black dots in Set d and Set e deviate noticeably from the abline, which reflects the parameter inaccuracies. But, for Set d, the recorded and simulated points align closely with each other, which weakens the evidence for misreporting. Hence, we are not strongly confident about the recording errors. For Set e, there are systematic differences between black dots and abline, and between blue dots and abline as well. As two sets of points diverge largely and irregularly from the reference line, the evidence is ambiguous due to sample variability (moderate to low confidence). Hence, we are not strongly confident about our conclusion compared to Set a.
 
 
 ### Question 4
