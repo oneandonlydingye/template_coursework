@@ -31,12 +31,13 @@ _In submitting this assessment you certify that it is entirely your own work, ap
 ```{r install}
 #| eval: false
 #| echo: false
-install.packages(c("rmarkdown", "knitr", "kableExtra"))
+install.packages(c("rmarkdown", "knitr", "kableExtra", "ggplot2"))
 ```
 ```{r setup, include = FALSE}
 library(rmarkdown)
 library(knitr)
 library(kableExtra)
+library(ggplot2)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -355,7 +356,75 @@ Does your answer contain:
 
 
 <!-- YOUR INVESTIGATION GOES HERE --> 
+```{r}
+#| echo: false
+#| layout-ncol: 2
+#| layout-nrow: 2
+#| fig-width: 6
+#| fig-height: 4
+#######################
+# Question 4
+#######################
+riverflow <- read.csv("riverflow_2015_2024.csv")
+View(riverflow) 
 
+sum(riverflow$is_extreme == "True") ## Number of True (is.extreme) is 300
+sum(riverflow$flow > 75) ## But we only have 158 values exceeding 75 cumecs
+sum(riverflow$flow <= 75 & riverflow$is_extreme == "True") 
+## There are too many entries lower than 75 but record as True,
+## thus we will not extract values according to "is_extreme" column.
+
+## Figure 1 
+# Extract year from Date
+riverflow$date <- as.Date(riverflow$date)
+riverflow$Year <- format(riverflow$date, "%Y")
+
+# Boxplot of baseline_mean by year
+ggplot(riverflow, aes(x = Year, y = baseline_mean)) +
+  geom_boxplot(fill = "pink", color = "black") +
+  theme_bw() +
+  labs(title = "Yearly Distribution of Baseline Mean",
+       y = "Baseline Mean of River Flow (m³/s)", x = "Year")
+
+
+## Figure 2
+# Time series of flow
+plot(riverflow$date, riverflow$flow, type = "l", col = "black",
+     xlab = "Date", ylab = "River Flow (m³/s)",
+     main = "Time Series of River Flow")
+
+## Figure 3
+u <- 75
+exceed <- riverflow$flow[riverflow$flow > u] - u
+
+u_simu <- 0
+sigma_simu <- 29.7
+xi_simu <- 0.62
+
+n <- length(exceed)
+p <- (1:n) / (n + 1)
+x_sorted <- sort(exceed)
+
+# Calculate the theoretical quantiles using our qgpd() function
+q_theoretical_sim <- qgpd(p, u = u_simu, sigma = sigma_simu, xi = xi_simu)
+
+plot(q_theoretical_sim, x_sorted, 
+     main = "QQ Plot for Exceedances (flow > 75)",
+     xlab = "Theoretical Quantiles",
+     ylab = "Observed Quantiles",
+     pch = 16, col = "black")
+abline(0, 1, col = "red", lwd = 2, lty = 2)
+legend("topleft",
+       legend = c("Observed exceedances", "45° reference line"),
+       pch = c(16, NA), lty = c(NA, 2), col = c("darkblue", "red"),
+       bty = "n")
+
+## Figure 4
+acf(as.numeric(riverflow$flow))
+acf(as.numeric(riverflow$flow > 75),
+    main = "ACF of Exceedance Indicator (River flow > 75)")
+acf(exceed, main = "ACF of Exceedance Magnitudes")
+```
 
 
 ::: {.callout-tip}
