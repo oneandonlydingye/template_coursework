@@ -31,13 +31,16 @@ _In submitting this assessment you certify that it is entirely your own work, ap
 ```{r install}
 #| eval: false
 #| echo: false
-install.packages(c("rmarkdown", "knitr", "kableExtra", "ggplot2"))
+install.packages(c("rmarkdown", "knitr", "kableExtra", "ggplot2", "stats", "ADGofTest", "KScorrect"))
 ```
 ```{r setup, include = FALSE}
 library(rmarkdown)
 library(knitr)
 library(kableExtra)
 library(ggplot2)
+library(stats)
+library(ADGofTest)
+library(KScorrect)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -321,13 +324,13 @@ for (a in datasets) {
 ```
 The @fig-qqplots above shows six QQ plots in one figure comparing the sample quantiles with theoretical quantiles based on both the recorded and the simulated parameter sets.
 
-For Set b, the points of recorded parameters (black) scatter closely along the abline, which indicates consistency with the stated distribution. In addition, the recorded and simulated parameter QQ plots overlap along the abline, suggesting that the recorded parameters were likely accurate. Hence, our confidence in this conclusion is high as both parameterisations produce consistent fits.
+For Set b (@fig-qqplots-2), the points of recorded parameters (black) scatter closely along the abline, which indicates consistency with the stated distribution. In addition, the recorded and simulated parameter QQ plots overlap along the abline, suggesting that the recorded parameters were likely accurate. Hence, our confidence in this conclusion is high as both parameterisations produce consistent fits.
 
-Additionally, Sets c and f demonstrate moderate deviations when using the recorded parameters, especially at higher quantiles. Both sets align closely with the simulated parameters (blue points), so both parameter sets yield almost identical distributional behaviour. Thus, we can infer that the recorded parameters were correctly specified. The deviation may arise from the sampling variability, because the amount of data for these two sets is low (45 and 22). The level of confidence is lower compared to set b. Because when both sets perform similarly (both showing deviations),  the evidence against parameter errors is weaker, and our confidence corresponds to the conclusion could be lower.
+Additionally, Sets c (@fig-qqplots-3) and Set f (@fig-qqplots-6) demonstrate moderate deviations when using the recorded parameters, especially at higher quantiles. Both sets align closely with the simulated parameters (blue points), so both parameter sets yield almost identical distributional behaviour. Thus, we can infer that the recorded parameters were correctly specified. The deviation may arise from the sampling variability, because the amount of data for these two sets is low (45 and 22). The level of confidence is lower compared to set b. Because when both sets perform similarly (both showing deviations),  the evidence against parameter errors is weaker, and our confidence corresponds to the conclusion could be lower.
 
-The plots for Set a, d and e present clear deviations, which suggests the parameters were likely recorded incorrectly. For Set a, recorded values deviate from the reference line, and simulated values follow closer to the reference line. This indicates a slight inconsistency with the stated distribution. The recorded and simulated points have distinct paths, especially when the blue points align closely with the red line and the black points do not. We interpret this pattern as strong evidence of parameter misreporting.
+The plots for Set a, d and e present clear deviations, which suggests the parameters were likely recorded incorrectly. For Set a (@fig-qqplots-1), recorded values deviate from the reference line, and simulated values follow closer to the reference line. This indicates a slight inconsistency with the stated distribution. The recorded and simulated points have distinct paths, especially when the blue points align closely with the red line and the black points do not. We interpret this pattern as strong evidence of parameter misreporting.
 
-Moreover, the black dots in Set d and Set e deviate noticeably from the abline, which reflects the parameter inaccuracies. But, for Set d, the recorded and simulated points align closely with each other, which weakens the evidence for misreporting. Hence, we are not strongly confident about the recording errors. For Set e, there are systematic differences between black dots and abline, and between blue dots and abline as well. As two sets of points diverge largely and irregularly from the reference line, the evidence is ambiguous due to sample variability (moderate to low confidence). Hence, we are not strongly confident about our conclusion compared to Set a.
+Moreover, the black dots in Set d and Set e deviate noticeably from the abline, which reflects the parameter inaccuracies. But, for Set d (@fig-qqplots-4), the recorded and simulated points align closely with each other, which weakens the evidence for misreporting. Hence, we are not strongly confident about the recording errors. For Set e (@fig-qqplots-5), there are systematic differences between black dots and abline, and between blue dots and abline as well. As two sets of points diverge largely and irregularly from the reference line, the evidence is ambiguous due to sample variability (moderate to low confidence). Hence, we are not strongly confident about our conclusion compared to Set a.
 
 
 ### Question 4
@@ -357,11 +360,7 @@ Does your answer contain:
 
 <!-- YOUR INVESTIGATION GOES HERE --> 
 ```{r}
-#| echo: false
-#| layout-ncol: 2
-#| layout-nrow: 2
-#| fig-width: 6
-#| fig-height: 4
+#| include: false
 #######################
 # Question 4
 #######################
@@ -374,26 +373,51 @@ sum(riverflow$flow <= 75 & riverflow$is_extreme == "True")
 ## There are too many entries lower than 75 but record as True,
 ## thus we will not extract values according to "is_extreme" column.
 
-## Figure 1 
+```
+We first examine the validity of the proposal: “the distribution of river flow values is constant over time”.  The proposal suggests the river flow’s statistical behaviour, for example, the mean, variance, and shape of the distribution do not change across years. We then conduct the box plot and the density plot to examine whether there is a long-term trend in the mean or variability of the river flow’s values. 
+```{r}
+#| echo: false
+#| fig-width: 5
+#| fig-height: 3
+#| label: fig-boxplot
+#| fig-cap: "Boxplots to examine the yearly distribution of baseline mean."
+## Figure 1 (Boxplot)
 # Extract year from Date
 riverflow$date <- as.Date(riverflow$date)
 riverflow$Year <- format(riverflow$date, "%Y")
 
 # Boxplot of baseline_mean by year
-ggplot(riverflow, aes(x = Year, y = baseline_mean)) +
-  geom_boxplot(fill = "pink", color = "black") +
-  theme_bw() +
+ggplot(riverflow, aes(x = Year, y = baseline_mean), cex.lab = 1.4) +
+  geom_boxplot(fill = "lightblue", color = "black") +
+  theme_light() +
   labs(title = "Yearly Distribution of Baseline Mean",
-       y = "Baseline Mean of River Flow (m³/s)", x = "Year")
+       y = "Baseline Mean of River Flow (m³/s)", x = "Year") 
+```
+The boxplot @fig-boxplot reveals the stability of central tendency and spread. We can see a clear long-term increase in flow magnitudes according to the baseline mean of river flow. Additionally, the yearly medians were not stable with a continuous increase in the value, suggesting strong evidence against hydrologist’s first proposal. The interquartile ranges are relatively consistent, which gives evidence for constant variance for the baseline means of river flow. From the gradual increase in the yearly median of river flow mean, we may conclude that the proposal was not valid for the dataset provided. 
+```{r}
+#| echo: false
+#| fig-width: 5
+#| fig-height: 3
+#| label: fig-density
+#| fig-cap: "Density plot to witness the shape of river flow each year."
+# Figure 2 (Density plot)
+ggplot(riverflow, aes(x = flow, colour = Year), cex.lab =1.4) +
+  geom_density() +
+  coord_cartesian(xlim = c(0, quantile(riverflow$flow, 0.99))) +
+  theme_light() +
+  labs(x = "Flow (m³/s)", y = "Density",
+       title = "Kernel Density Estimates by Year")
+```
+@fig-density shows the kernel density estimates of river flow for each year between 2015 and 2024. The kernel density in density plots helps us to estimate the probability density function and captures the underlying patterns without assuming a specific distribution. @(references) It illustrates the overall shape of the flow distribution for each year and informs stability in higher-order distributional properties, like skewness, tail behaviour. The distributions across years exhibit a broadly similar shape with right skewness. However, there are distinct differences in the height and spread of the peaks, which indicate year-to-year variations. A systematic trend is observed in the figure, as the flow values become less right-skewed from 2015 to 2024, and the peaks of the flows shift rightwards as the year increases. Hence, this density plot does not support the proposal which reckons the distribution of flow values is constant over time.
 
-
-## Figure 2
-# Time series of flow
-plot(riverflow$date, riverflow$flow, type = "l", col = "black",
-     xlab = "Date", ylab = "River Flow (m³/s)",
-     main = "Time Series of River Flow")
-
-## Figure 3
+We then examine the validity of the second proposal: “for river flows exceeding 75 cumecs, it is appropriate to model these data as independent and identically distributed GPD(sigma = 29.7, xi = 0.62, u = 0). The proposal suggests that for flows larger than 75 cumecs, the exceedances above the threshold follow a Generalised Pareto Distribution (GPD) with those specified shape and scale parameters, and these exceedances have no serial correlation with each other and follow the same GPD distribution across time. 
+```{r}
+#| echo: false
+#| fig-width: 6
+#| fig-height: 4
+#| label: fig-qqplot2
+#| fig-cap: "QQ plot to examine the GPD's goodness of fit."
+## Figure 3 (QQ plot)
 u <- 75
 exceed <- riverflow$flow[riverflow$flow > u] - u
 
@@ -412,20 +436,38 @@ plot(q_theoretical_sim, x_sorted,
      main = "QQ Plot for Exceedances (flow > 75)",
      xlab = "Theoretical Quantiles",
      ylab = "Observed Quantiles",
-     pch = 16, col = "black")
+     pch = 16, col = rgb(0,0,0,0.5))
 abline(0, 1, col = "red", lwd = 2, lty = 2)
 legend("topleft",
        legend = c("Observed exceedances", "45° reference line"),
-       pch = c(16, NA), lty = c(NA, 2), col = c("darkblue", "red"),
+       pch = c(16, NA), lty = c(NA, 2), col = c(rgb(0,0,0,0.5), "red"),
        bty = "n")
+```
+For values exceeding 75 cumecs, we extract the exceedances and compare them against a theoretical GPD(with sigma=29.7, xi=0.62). In the QQ plot @fig-qqplot2, the sample quantiles of exceedances were plotted against theoretical quantiles computed from the specified GPD model. Although there are slight deviations seen in the upper tail, it supports the proposal as the points scatter closely to the 45° reference line. Overall, the proposed GPD model appears reasonably fit to the tail behaviour of the river flow data. 
+```{r}
+#| echo: false
+#| layout-ncol: 3
+#| layout-nrow: 1
+#| fig-width: 6
+#| fig-height: 4
+#| label: fig-exceed
+#| fig-cap: "Trace plot & ACF plots to examine the independence of river flow."
+#| fig-subcap:
+#|   - "Trace plot of flow > 75 cumecs"
+#|   - "ACF plot of All River Flow"
+#|   - "ACF plot of Flow Exceeding 75 cumecs"
+## Figure 4 (Trace plot & ACF plots)
+plot(exceed, type = "l", col = "black",
+     xlab = "Date", ylab = "River Flow (m³/s)",
+     main = "Time Series of River Flow")
 
-## Figure 4
-acf(as.numeric(riverflow$flow))
-acf(as.numeric(riverflow$flow > 75),
-    main = "ACF of Exceedance Indicator (River flow > 75)")
+acf(as.numeric(riverflow$flow), main = "ACF of All River Flow")
 acf(exceed, main = "ACF of Exceedance Magnitudes")
 ```
+Focusing on the “independent and identically distributed (i.i.d.)” component, we first draw a trace plot (@fig-exceed-1) of the exceedances. There is a lack of systematic trends and substantial clustering except for one peak point, indicating minimal temporal dependence in the values and supporting the i.i.d. assumption.
 
+We then draw the ACF plots (@fig-exceed-2 & @fig-exceed-3) to investigate the independence of exceedances. The ACF plots conduct autocorrelation diagnostics of time series and capture patterns of temporal dependence. @(references). 
+There is no bar extending beyond 95% confidence bounds, which means that the exceedance magnitudes show no significant autocorrelation problems. Besides, no geometrical and gradual decay in bar heights shows that there is no long-run dependency in the values. Furthermore, there are no regular spikes at specified lags. This supports our conclusion from the trace plot, which says there is no seasonal pattern among the exceedances, suggesting that the river flow exceeding 75 can be treated as independent and identically distributed. To summarise, these three visualisations in one figure (@fig-exceed) give strong support to the hydrologist’s second proposal.
 
 ::: {.callout-tip}
 ## Set yourself up for success 
