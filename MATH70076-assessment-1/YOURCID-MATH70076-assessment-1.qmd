@@ -31,7 +31,8 @@ _In submitting this assessment you certify that it is entirely your own work, ap
 ```{r install}
 #| eval: false
 #| echo: false
-install.packages(c("rmarkdown", "knitr", "kableExtra", "ggplot2", "stats", "ADGofTest", "KScorrect"))
+install.packages(c("rmarkdown", "knitr", "kableExtra", 
+                   "ggplot2", "stats", "ADGofTest", "KScorrect"))
 ```
 ```{r setup, include = FALSE}
 library(rmarkdown)
@@ -374,49 +375,50 @@ sum(riverflow$flow <= 75 & riverflow$is_extreme == "True")
 ## thus we will not extract values according to "is_extreme" column.
 
 ```
-We first examine the validity of the proposal: “the distribution of river flow values is constant over time”.  The proposal suggests the river flow’s statistical behaviour, for example, the mean, variance, and shape of the distribution do not change across years. We then conduct the box plot and the density plot using "ggplot2"  [@Ross2018] to examine whether there is a long-term trend in the mean or variability of the river flow’s values. 
+We first examine the validity of the proposal that “the distribution of river flow values is constant over time”.  The proposal implies that the statistical characteristics of river flow data, for example, its mean, variance, and shape of the distribution remained unchanged across years. To examine this, we produce a box plot and a density plot using *ggplot2* [@Ross2018] to evaluate whether there is a systematic trend in the mean or variability of the annual river flow’s values. 
 ```{r}
 #| echo: false
 #| fig-width: 5
 #| fig-height: 3
 #| label: fig-boxplot
-#| fig-cap: "Boxplots to examine the yearly distribution of baseline mean."
+#| fig-cap: "Boxplot to examine the yearly distribution of baseline mean."
 ## Figure 1 (Boxplot)
 # Extract year from Date
 riverflow$date <- as.Date(riverflow$date)
 riverflow$Year <- format(riverflow$date, "%Y")
 
 # Boxplot of baseline_mean by year
-ggplot(riverflow, aes(x = Year, y = baseline_mean), cex.lab = 1.4) +
+ggplot(riverflow, aes(x = Year, y = baseline_mean), cex.lab = 1.2) +
   geom_boxplot(fill = "lightblue", color = "black") +
   theme_light() +
-  labs(title = "Yearly Distribution of Baseline Mean",
+  labs(title = "Yearly Distribution of Baseline Mean of River Flow",
        y = "Baseline Mean of River Flow (m³/s)", x = "Year") 
 ```
-The boxplot @fig-boxplot reveals the stability of central tendency and spread. We can see a clear long-term increase in flow magnitudes according to the baseline mean of river flow. Additionally, the yearly medians were not stable with a continuous increase in the value, suggesting strong evidence against hydrologist’s first proposal. The interquartile ranges are relatively consistent, which gives evidence for constant variance for the baseline means of river flow. From the gradual increase in the yearly median of river flow mean, we may conclude that the proposal was not valid for the dataset provided. 
+The boxplot @fig-boxplot demonstrates a distribution of yearly river flow averages and helps us to examine the stability of central tendency and spread of data. We can see a clear long-term increase in flow magnitudes over the years. Additionally, the median flow values show a continuous upward trend in the value, which provides strong evidence against hydrologist’s assumption of a stationary mean. The interquartile ranges are relatively stable, which gives evidence for largely constant variability of flow data. Overall, the figure indicates that while the spread of flow values does not change markedly, their central tendency has increased over the years, which contradicts the hydrologist’s first proposal.
 ```{r}
 #| echo: false
 #| fig-width: 5
-#| fig-height: 3
+#| fig-height: 2.8
+#| fig-pos: "H"
 #| label: fig-density
-#| fig-cap: "Density plot to witness the shape of river flow each year."
+#| fig-cap: "Density plot to visualise the shape of river flow data each year."
 # Figure 2 (Density plot)
 ggplot(riverflow, aes(x = flow, colour = Year), cex.lab =1.4) +
   geom_density() +
   coord_cartesian(xlim = c(0, quantile(riverflow$flow, 0.99))) +
   theme_light() +
-  labs(x = "Flow (m³/s)", y = "Density",
-       title = "Kernel Density Estimates by Year")
+  labs(x = "River Flow (m³/s)", y = "Density",
+       title = "Density Plot of River flow by Year")
 ```
-@fig-density on the next page shows the kernel density estimates of river flow for each year between 2015 and 2024. The kernel density in density plots helps us to estimate the probability density function and captures the underlying patterns without assuming a specific distribution [@Tollefson2021]. It illustrates the overall shape of the flow distribution for each year and informs stability in higher-order distributional properties, like skewness, tail behaviour. The distributions across years exhibit a broadly similar shape with right skewness. However, there are distinct differences in the height and spread of the peaks, which indicate year-to-year variations. A systematic trend is observed in the figure, as the flow values become less right-skewed from 2015 to 2024, and the peaks of the flows shift rightwards as the year increases. Hence, this density plot does not support the proposal which reckons the distribution of flow values is constant over time.
+@fig-density displays the kernel density estimates of river flow for each year between 2015 and 2024. Kernel density estimation provides a smooth, nonparametric representation of the underlying probability density without assuming a specific functional for our data [@Tollefson2021]. It illustrates the overall shape of the flow values for each year and captures the underlying patterns and properties of distribution, like skewness, tail behaviours. The distributions of each year share a broadly similar right-skewed shape. However, the peaks of the densities shift rightward over time and the degree of right skewness decreases. This suggests a progressive increase in annual flow levels and a slight reduction in tail heaviness of data over the years. These patterns imply that the distribution of river flow is not constant over time. As a result, both the boxplot and density plot provide evidence that the hydrologist’s proposal of a time-invariant distribution is not supported by the data.
 
-We then examine the validity of the second proposal: “for river flows exceeding 75 cumecs, it is appropriate to model these data as independent and identically distributed GPD(sigma = 29.7, xi = 0.62, u = 0). The proposal suggests that for flows larger than 75 cumecs, the exceedances above the threshold follow a Generalised Pareto Distribution (GPD) with those specified shape and scale parameters, and these exceedances have no serial correlation with each other and follow the same GPD distribution across time. 
+We then evaluate the second proposal: “for river flows exceeding 75 cumecs, it is appropriate to model these data as independent and identically distributed GPD(sigma = 29.7, xi = 0.62, u = 0). The proposal suggests that all flows above the threshold of 75 cumecs follow a same Generalised Pareto Distribution (GPD) with those specified shape and scale parameters, and these exceedances have no serial dependence with each other.
 ```{r}
 #| echo: false
-#| fig-width: 6
+#| fig-width: 5
 #| fig-height: 4
 #| label: fig-qqplot2
-#| fig-cap: "QQ plot to examine the GPD's goodness of fit."
+#| fig-cap: "QQ plot to examine the GPD's goodness of fit to exceedances."
 ## Figure 3 (QQ plot)
 u <- 75
 exceed <- riverflow$flow[riverflow$flow > u] - u
@@ -436,38 +438,42 @@ plot(q_theoretical_sim, x_sorted,
      main = "QQ Plot for Exceedances (flow > 75)",
      xlab = "Theoretical Quantiles",
      ylab = "Observed Quantiles",
-     pch = 16, col = rgb(0,0,0,0.5))
+     pch = 16, 
+     col = rgb(0,0,0,0.5),
+     cex.lab = 1
+     cex.main = 1.4)
 abline(0, 1, col = "red", lwd = 2, lty = 2)
 legend("topleft",
        legend = c("Observed exceedances", "45° reference line"),
        pch = c(16, NA), lty = c(NA, 2), col = c(rgb(0,0,0,0.5), "red"),
        bty = "n")
 ```
-For values exceeding 75 cumecs, we extract the exceedances and compare them against a theoretical GPD(with sigma=29.7, xi=0.62). In the QQ plot @fig-qqplot2, the sample quantiles of exceedances were plotted against theoretical quantiles computed from the specified GPD model. Although there are slight deviations seen in the upper tail, it supports the proposal as the points scatter closely to the 45° reference line. Overall, the proposed GPD model appears reasonably fit to the tail behaviour of the river flow data. 
+To assess the suitability of proposed GPD model, we extract the exceedances above 75 cumecs and compared their empirical quantiles with theoretical quantiles computed from GPD(sigma = 29.7, xi = 0.62). In the QQ plot (@fig-qqplot2), the points of sample quantiles closely scatter along the reference line, with only slight deviations in the upper tail. Due to limited data, such departures are expected reasonably in extreme-value modelling. Overall, the plot indicates that the proposed GPD model with specified parameters capture the tail behaviour of the river flow data reasonably well.
 ```{r}
 #| echo: false
 #| layout-ncol: 3
 #| layout-nrow: 1
-#| fig-width: 6
-#| fig-height: 4
+#| fig-width: 7
+#| fig-height: 5
 #| label: fig-exceed
-#| fig-cap: "Trace plot & ACF plots to examine the independence of river flow."
+#| fig-cap: "Trace plot & ACF plots to examine the i.i.d. assumptions of flow."
 #| fig-subcap:
 #|   - "Trace plot of flow > 75 cumecs"
-#|   - "ACF plot of All River Flow"
-#|   - "ACF plot of Flow Exceeding 75 cumecs"
+#|   - "ACF plot of Flow > 75 cumecs"
+#|   - "ACF plot of All Flow Values"
 ## Figure 4 (Trace plot & ACF plots)
 plot(exceed, type = "l", col = "black",
      xlab = "Date", ylab = "River Flow (m³/s)",
      main = "Time Series of River Flow")
 
-acf(as.numeric(riverflow$flow), main = "ACF of All River Flow")
 acf(exceed, main = "ACF of Exceedance Magnitudes")
+acf(as.numeric(riverflow$flow), main = "ACF of All River Flow")
 ```
-Focusing on the “independent and identically distributed (i.i.d.)” component, we first draw a trace plot (@fig-exceed-1) of the exceedances. There is a lack of systematic trends and substantial clustering except for one peak point, indicating minimal temporal dependence in the values and supporting the i.i.d. assumption.
+Focusing on the “independent and identically distributed (i.i.d.)” component, we produce three visualisations in one figure (@fig-exceed) to validate the hydrologist’s second proposal.We first draw a trace plot (@fig-exceed-1) of the exceedances. There is a lack of systematic trends and substantial clustering except for one peak point, indicating minimal temporal dependence in the values and supporting the i.i.d. assumption.
 
-We then draw the ACF plots (@fig-exceed-2 & @fig-exceed-3) to investigate the independence of exceedances. The ACF plots conduct autocorrelation diagnostics of time series and capture patterns of temporal dependence [@Tollefson2021]. 
-There is no bar extending beyond 95% confidence bounds, which means that the exceedance magnitudes show no significant autocorrelation problems. Besides, no geometrical and gradual decay in bar heights shows that there is no long-run dependency in the values. Furthermore, there are no regular spikes at specified lags. This supports our conclusion from the trace plot, which says there is no seasonal pattern among the exceedances, suggesting that the river flow exceeding 75 can be treated as independent and identically distributed. To summarise, these three visualisations in one figure (@fig-exceed) give strong support to the hydrologist’s second proposal.
+We then utilise the ACF plot (@fig-exceed-2) to investigate the independence of exceedances. The ACF plots conduct autocorrelation diagnostics of time series and capture patterns of temporal dependence [@Tollefson2021]. There is no bar extending beyond 95% confidence bounds in @fig-exceed-3, which means that the exceedance magnitudes show no significant autocorrelation problems. Besides, no geometrical and gradual decay in bar heights shows that there is no long-run dependency in the values. Furthermore, there are no regular spikes at specified lags. This supports our conclusion from the trace plot, which says there is no seasonal pattern among the exceedances, suggesting that the river flow exceeding 75 can be treated as independent and identically distributed. To summarise, @fig-exceed-1 and @fig-exceed-2 give strong support to the hydrologist’s second proposal. 
+
+Lastly, the ACF plot can also be used to examine al river flow's values. With some notable spikes above confidence bounds and a gradual decline in the bar's heights, the @fig-exceed-3 supports our conclusion towards the first proposal of the hydrologist which disagrees her idea of "the distribution of river flow values is constant over time".
 
 ::: {.callout-tip}
 ## Set yourself up for success 
