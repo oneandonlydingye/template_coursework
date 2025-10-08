@@ -31,17 +31,13 @@ _In submitting this assessment you certify that it is entirely your own work, ap
 ```{r install}
 #| eval: false
 #| echo: false
-install.packages(c("rmarkdown", "knitr", "kableExtra", 
-                   "ggplot2", "stats", "ADGofTest", "KScorrect"))
+install.packages(c("rmarkdown", "knitr", "ggplot2", "stats"))
 ```
 ```{r setup, include = FALSE}
 library(rmarkdown)
 library(knitr)
-library(kableExtra)
 library(ggplot2)
 library(stats)
-library(ADGofTest)
-library(KScorrect)
 
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -323,15 +319,17 @@ for (a in datasets) {
        pch = c(16, 17), col = c("black", "blue"), bty = "n", cex = 2)
 }
 ```
-The @fig-qqplots above shows six QQ plots in one figure comparing the sample quantiles with theoretical quantiles based on both the recorded and the simulated parameter sets. The 45 red dashed line represents perfect agreement between theoretical and empirical quantiles.
+The @fig-qqplots above shows six QQ plots in one figure comparing the sample quantiles with theoretical quantiles based on both the recorded and the simulated parameter sets. The 45 sred dashed line represents perfect agreement between theoretical and empirical quantiles.
 
 For Set b (@fig-qqplots-2), the points of recorded parameters (black) scatter closely along the abline, which indicates consistency with the stated distribution. In addition, the recorded and simulated parameter curves perfectly overlap along the abline, suggesting that the recorded parameters were accurately specified. Hence, our confidence in this conclusion is high as both parameterisations produce consistent fits.
 
 Additionally, Sets c (@fig-qqplots-3) and Set f (@fig-qqplots-6) demonstrate moderate deviations when using the recorded parameters, particularly at higher quantiles. Both sets align closely with the simulated parameters (blue points), so both parameter sets yield almost identical distributional behaviour. Thus, we can infer that the recorded parameters were likely specified correctly. The deviation may arise from the sampling variability, because the amount of data for these two sets is low (20 and 98). The level of confidence is lower compared to Set b. Because when both sets perform similarly (both showing deviations), the evidence against reporting errors is weaker. Although the recorded parameters are not clearly incorrect, the limited data reduce our confidence in the conclusion.
 
-In contrast, the plots for Set a, d and e present noticeable departure from the 45 reference line, which suggests the parameters were likely recorded incorrectly. For Set a (@fig-qqplots-1), recorded values deviate from the reference line, and simulated values follow closer to the reference line. This indicates a slight inconsistency with the stated distribution. The recorded and simulated points have distinct paths, especially when the blue points align closely with the red line and the black points do not. We interpret this pattern as strong evidence of parameter misreporting.
+In contrast, the plots for Set a, d and e present noticeable departure from the 45 reference line, which suggests the parameters were likely recorded incorrectly. For Set a (@fig-qqplots-1), recorded values deviate from the reference line while simulated values lie closer to the reference line. The distinct divergence between black and blue points provides strong evidence that the recorded parameters were inaccurately reported.
 
-Moreover, the black dots in Set d and Set e deviate noticeably from the abline, which reflects the parameter inaccuracies. But, for Set d (@fig-qqplots-4), the recorded and simulated points align closely with each other, which weakens the evidence for misreporting. Hence, we are not strongly confident about the recording errors. For Set e (@fig-qqplots-5), there are systematic differences between black dots and abline, and between blue dots and abline as well. As two sets of points diverge largely and irregularly from the reference line, the evidence is ambiguous due to sample variability (moderate to low confidence). Hence, we are not strongly confident about our conclusion compared to Set a.
+Moreover, Set d (@fig-qqplots-4) also displays deviation from the reference line, but the recorded and simulated points align closely with each other. Since both parameter sets provide similar fits, the evidence for parameter errors is weakened, and our confidence in this conclusion is less compared to Set a.
+
+Finally, for Set e (@fig-qqplots-5), there are substantial and irregular departures from the abline to both parameter sets. This suggests that the fit qualities for both quantiles are poor. Hence, our conclusions to Set e remain uncertain, with only moderate to low level of confidence.
 
 
 ### Question 4
