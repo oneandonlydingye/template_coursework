@@ -408,7 +408,7 @@ ggplot(riverflow, aes(x = flow, colour = Year), cex.lab =1.4) +
   labs(x = "River Flow (m³/s)", y = "Density",
        title = "Density Plot of River flow by Year")
 ```
-@fig-density displays the kernel density estimates of river flow for each year between 2015 and 2024. Kernel density estimation provides a smooth, nonparametric representation of the underlying probability density without assuming a specific functional for our data [@Tollefson2021]. It illustrates the overall shape of the flow values for each year and captures the underlying patterns and properties of distribution, like skewness, tail behaviours. The distributions of each year share a broadly similar right-skewed shape. However, the peaks of the densities shift rightward over time and the degree of right skewness decreases. This suggests a progressive increase in annual flow levels and a slight reduction in tail heaviness of data over the years. These patterns imply that the distribution of river flow is not constant over time. As a result, both the boxplot and density plot provide evidence that the hydrologist’s proposal of a time-invariant distribution is not supported by the data.
+@fig-density displays the kernel density estimates of river flow for each year between 2015 and 2024. Kernel density estimation provides a smooth, nonparametric representation of the underlying probability density without assuming a specific distribution for our data [@Tollefson2021]. It illustrates the overall shape of the flow values for each year and captures the underlying patterns and properties of distribution, like skewness, tail behaviours. The distributions of each year share a broadly similar right-skewed shape. However, the peaks of the densities shift rightward over time and the degree of right skewness decreases. This suggests a progressive increase in annual flow levels and a slight reduction in tail heaviness of data over the years. These patterns imply that the distribution of river flow is not constant over time. As a result, both the boxplot and density plot provide evidence that the hydrologist’s proposal of a time-invariant distribution is not supported by the data.
 
 We then evaluate the second proposal: “for river flows exceeding 75 cumecs, it is appropriate to model these data as independent and identically distributed GPD(sigma = 29.7, xi = 0.62, u = 0). The proposal suggests that all flows above the threshold of 75 cumecs follow a same Generalised Pareto Distribution (GPD) with those specified shape and scale parameters, and these exceedances have no serial dependence with each other.
 ```{r}
@@ -451,7 +451,7 @@ To assess the suitability of proposed GPD model, we extract the exceedances abov
 #| echo: false
 #| layout-ncol: 3
 #| layout-nrow: 1
-#| fig-width: 7
+#| fig-width: 8
 #| fig-height: 5
 #| label: fig-exceed
 #| fig-cap: "Time series plot & ACF plots to examine the i.i.d. assumptions of 
@@ -468,7 +468,7 @@ plot(exceed, type = "l", col = "black",
 acf(exceed, main = "ACF of Flows Exceeding 75 cumecs")
 acf(as.numeric(riverflow$flow), main = "ACF of All River Flows")
 ```
-To validate the “independent and identically distributed (i.i.d.)” assumption, we produce three visualisations in one figure (@fig-exceed). The trace plot (@fig-exceed-1) displays exceedances over time and demonstrates no evident systematic trends and volatility clustering patterns except for one isolated peak point of river flow. This indicates the distribution of exceedances is relatively stable and particularly supports the "identically distributed" assumption.
+To validate the “independent and identically distributed (i.i.d.)” assumption, we produce three visualisations in one figure (@fig-exceed). The time series plot (@fig-exceed-1) displays exceedances over time and demonstrates no evident systematic trends and volatility clustering patterns except for one isolated peak point of river flow. This indicates the distribution of exceedances is relatively stable and particularly supports the "identically distributed" assumption.
 
 In addition, we utilise the autocorrelation function (ACF) plots (@fig-exceed-2) to investigate the dependency of exceedances data. The ACF plots conduct correlation diagnostics of time series and capture patterns of serial dependence [@Tollefson2021]. There is no bar extending beyond 95% confidence bounds in @fig-exceed-2, and no geometrical and gradual decay in bars. Besides, there are no periodic spikes at specified lags. Hence, the values shows no autocorrelation problems and the plot supports our conclusion from the trace plot, which there is no long-run dependency in the exceedances. Overall, @fig-exceed-1 and @fig-exceed-2 give strong support to the hydrologist’s proposal that the river flow exceeding 75 cumecs can be treated as independent and identically distributed. 
 
