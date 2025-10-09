@@ -9,7 +9,7 @@ format:
     self-contained: true
   pdf: default
 format-links: false
-bibliography: "example.bib"
+bibliography: "MSc_Statistics_coursework_quarto.bib"
 ---
 
 **Deadline:  Friday 10 October 2025 at 13:00.**
@@ -103,8 +103,44 @@ Does your answer contain:
 \quad
 We aim to obtain the inverse cumulative distribution function (CDF) of the Generalised Pareto Distribution (GPD). According to Probability Integral Transform, we know that if we let $A = F_X(X)$, and if $A \sim U[0,1]$, then the quantile function $F^{-1}_X: [0,1] \rightarrow [u, x^+]$ (inverse CDF function) can be derived from the @eq-gpd-cdf. Hence, we let $A\in [0,1]$ and solve for $x$.
 
-The inverse CDF function could be divided into 2 situations. We start from the CDF of the GPD when $(\xi \neq 0)$:
+The inverse CDF function could be divided into 2 situations ($\xi \ne 0$ and $\xi = 0$). We first handle the case for $\xi \ne 0$.
 
+If $$\left(1 + \frac{\xi (x - u)}{\sigma}\right)_+ = \max\left(1 + \frac{\xi (x - u)}{\sigma}, 0\right) = 1 + \frac{\xi (x - u)}{\sigma}, $$
+
+$$
+1 + \frac{\xi (x - u)}{\sigma} > 0 \quad \iff
+$$
+$$
+\frac{\xi (x - u)}{\sigma} > -1 \quad \iff
+$$
+$$
+\xi (x - u) > -\sigma \quad \iff
+$$
+$$
+x - u > -\sigma / \xi \quad \iff
+$$
+
+As $\sigma > 0$, we have 2 situations according to the value of $\xi$:
+$$
+x
+\begin{cases}
+> u - \sigma / \xi, & if \quad \xi > 0 \\
+< u - \sigma / \xi, & if \quad \xi < 0
+\end{cases}
+$$
+
+When $\xi > 0$, the inequality holds as $x \ge u$.  
+
+When $\xi < 0$, the distribution reaches the finite upper endpoint of $x^+ = u - \sigma / \xi$, then $\left(1 + \dfrac{\xi (x - u)}{\sigma}\right)_+ = 0$. Therefore, we get:
+$$
+F^{-1}(1) = x^+ = 
+\begin{cases}
+u - \sigma / \xi &  if \quad \xi < 0 \\
++\infty & if \quad \xi \ge 0
+\end{cases}
+$$
+
+We then compute of quantile function from the CDF of the GPD when $(\xi \neq 0)$:
 $$
 A = 1 - \left(1 + \frac{\xi(x - u)}{\sigma}\right)^{-1/\xi} \quad \iff
 $$
@@ -124,13 +160,13 @@ $$
 x - u = \frac{\sigma}{\xi} ((1 - A)^{-\xi} - 1) \quad \iff
 $$
 $$
-x = u + \frac{\sigma}{\xi} \left[ (1 - A)^{-\xi} - 1 \right].
+x = u + \frac{\sigma}{\xi} \left[ (1 - A)^{-\xi} - 1 \right]
 $$
 
 Hence, for $\xi \neq 0$, the quantile function is
 
 $$
-F_X^{-1}(A) = u + \frac{\sigma}{\xi}\left[ (1 - A)^{-\xi} - 1 \right],  \quad A\in [0,1].
+F_X^{-1}(A) = u + \frac{\sigma}{\xi}\left[ (1 - A)^{-\xi} - 1 \right],  \quad A\in [0,1)
 $$
 
 For the other case $\xi = 0$, we derive the inverse CDF function from the @eq-gpd-pdf, again we let $A\in [0,1]$ and set $A = F_X(X)$, then we get:
@@ -154,9 +190,19 @@ $$
 Hence, for $\xi = 0$, the quantile function is
 
 $$
-F_X^{-1}(A) = u - \sigma \ln(1 - A), \quad A\in [0,1].
+F_X^{-1}(A) = u - \sigma \ln(1 - A), \quad A\in [0,1)
 $$
 
+As a result, the quantile function $F_X^{-1} : [0,1] \rightarrow [u, x^+]$ of $X \sim \text{GPD}(u, \sigma, \xi)$ can be written as:
+
+$$
+F_X^{-1}(A) = 
+\begin{cases}
+u + \frac{\sigma}{\xi}\left[ (1 - A)^{-\xi} - 1 \right], & for \quad A\in [0,1), \quad \xi \ne 0 \\[8pt]
+u - \sigma \ln(1 - A), & for \quad A\in [0,1) , \quad \xi = 0
+\end{cases}
+$$
+with $F_X^{-1}(1) = x^+$.
 
 ### Question 2 
 
@@ -231,7 +277,7 @@ qgpd <- function(p, u, sigma, xi) {
 For (b),
 ```{r}
 # Part B --------------------------
-# set values for given parameters
+# assign values to given parameters
 p <- c(0.5, 0.75, 0.99)
 u <- 1.5
 sigma <- 2
@@ -285,8 +331,6 @@ Does your solution contain:
 #######################
 samples <- read.csv("gpd_samples.csv")
 parameters <- read.csv("gpd_parameters.csv")
-View(samples)
-View(parameters)
 
 # Plot with the use of loops
 datasets <- unique(samples$set_id)
@@ -309,23 +353,23 @@ for (a in datasets) {
 
   q_theoretical <- qgpd(p, u = u, sigma = sigma, xi = xi)
   q_sim <- qgpd(p, u = u_sim, sigma = sigma_sim, xi = xi_sim)
-  plot(q_theoretical, x_sorted, main = "", 
+  plot(q_theoretical, x_sorted,
          cex.axis = 1.4, cex.lab = 1.4, pch = 16,
          xlab = "Theoretical Quantiles", ylab = "Sample Quantiles")
   abline(0, 1, col = "red", lty = 2)
   points(q_sim, x_sorted, pch = 17, col = "blue")
   legend("topleft",
-       legend = c("recorded parameters", "simulated parameters"),
-       pch = c(16, 17), col = c("black", "blue"), bty = "n", cex = 2)
+       legend = c("recorded parameters", "simulated parameters", "reference line"),
+       pch = c(16, 17, NA), lty = c(NA, NA, 2), col = c("black", "blue","red"), bty = "n", cex = 2)
 }
 ```
 The @fig-qqplots above shows six QQ plots in one figure comparing the sample quantiles with theoretical quantiles based on both the recorded and the simulated parameter sets. The 45 sred dashed line represents perfect agreement between theoretical and empirical quantiles.
 
 For Set b (@fig-qqplots-2), the points of recorded parameters (black) scatter closely along the abline, which indicates consistency with the stated distribution. In addition, the recorded and simulated parameter curves perfectly overlap along the abline, suggesting that the recorded parameters were accurately specified. Hence, our confidence in this conclusion is high as both parameterisations produce consistent fits.
 
-Additionally, Sets c (@fig-qqplots-3) and Set f (@fig-qqplots-6) demonstrate moderate deviations when using the recorded parameters, particularly at higher quantiles. Both sets align closely with the simulated parameters (blue points), so both parameter sets yield almost identical distributional behaviour. Thus, we can infer that the recorded parameters were likely specified correctly. The deviation may arise from the sampling variability, because the amount of data for these two sets is low (20 and 98). The level of confidence is lower compared to Set b. Because when both sets perform similarly (both showing deviations), the evidence against reporting errors is weaker. Although the recorded parameters are not clearly incorrect, the limited data reduce our confidence in the conclusion.
+Additionally, Sets c (@fig-qqplots-3) and Set f (@fig-qqplots-6) demonstrate moderate deviations when using the recorded parameters, particularly at higher quantiles. Both sets align closely with the simulated parameters (blue points), so both parameter sets produce almost identical distributional behaviours. Thus, we can infer that the recorded parameters were likely specified correctly. The deviation may arise from the sampling variability, because the amount of data for these two sets is low (20 and 98). The level of confidence is lower compared to Set b. Because when both sets perform similarly (both showing deviations), the evidence against reporting errors is weaker. Although the recorded parameters are not clearly incorrect, the limited data reduce our confidence in the conclusion.
 
-In contrast, the plots for Set a, d and e present noticeable departure from the 45 reference line, which suggests the parameters were likely recorded incorrectly. For Set a (@fig-qqplots-1), recorded values deviate from the reference line while simulated values lie closer to the reference line. The distinct divergence between black and blue points provides strong evidence that the recorded parameters were inaccurately reported.
+In contrast, the plots for Set a, d and e present noticeable departure from the 45 reference line, which suggests the parameters were likely recorded incorrectly. For Set a (@fig-qqplots-1), recorded values deviate from the reference line while simulated values lie closer to the reference line. The distinct divergence between black and blue points provides strong evidence that the recorded parameters were inaccurately reported. Using GPD to model the data, 
 
 Moreover, Set d (@fig-qqplots-4) also displays deviation from the reference line, but the recorded and simulated points align closely with each other. Since both parameter sets provide similar fits, the evidence for parameter errors is weakened, and our confidence in this conclusion is less compared to Set a.
 
@@ -364,7 +408,6 @@ Does your answer contain:
 # Question 4
 #######################
 riverflow <- read.csv("riverflow_2015_2024.csv")
-View(riverflow) 
 
 sum(riverflow$is_extreme == "True") ## Number of True (is.extreme) is 300
 sum(riverflow$flow > 75) ## But we only have 158 values exceeding 75 cumecs
@@ -386,13 +429,14 @@ riverflow$date <- as.Date(riverflow$date)
 riverflow$Year <- format(riverflow$date, "%Y")
 
 # Boxplot of baseline_mean by year
-ggplot(riverflow, aes(x = Year, y = baseline_mean), cex.lab = 1.2) +
+ggplot(riverflow, aes(x = Year, y = flow), cex.lab = 1.2) +
   geom_boxplot(fill = "lightblue", color = "black") +
   theme_light() +
-  labs(title = "Yearly Distribution of Baseline Mean of River Flow",
-       y = "Baseline Mean of River Flow (m³/s)", x = "Year") 
+  labs(title = "Yearly Distribution of River Flow",
+       y = "Baseline Mean of River Flow (m³/s)", x = "Year") +
+       coord_cartesian(ylim = c(0, 150))
 ```
-The boxplot @fig-boxplot demonstrates a distribution of yearly river flow averages and helps us to examine the stability of central tendency and spread of data. We can see a clear long-term increase in flow magnitudes over the years. Additionally, the median flow values show a continuous upward trend in the value, which provides strong evidence against hydrologist’s assumption of a stationary mean. The interquartile ranges are relatively stable, which gives evidence for largely constant variability of flow data. Overall, the figure indicates that while the spread of flow values does not change markedly, their central tendency has increased over the years, which contradicts the hydrologist’s first proposal.
+The boxplot @fig-boxplot demonstrates a distribution of yearly river flow values and helps us to examine the stability of central tendency and spread of data. We can see a clear long-term increase in flow magnitudes over the years. Additionally, the median flow values show a slight continuous upward trend in the value, which provides strong evidence against hydrologist’s assumption of a stationary mean. The interquartile ranges are relatively stable from 2015 to 2019, but has increased since 2022, which gives evidence for inconsistent variability of flow data. Overall, the figure indicates that while the spread of flow values does not change markedly, their central tendency has increased over the years, which contradicts the hydrologist’s first proposal.
 ```{r}
 #| echo: false
 #| fig-width: 5
